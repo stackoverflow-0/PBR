@@ -114,8 +114,8 @@ void main()
         // calculate per-light radiance
     vec3 L = normalize(lightPos - FragPos);
     vec3 H = normalize(V + L);
-    float distance    = length(lightPos - FragPos) / 10;
-    float attenuation = 1.0 / (distance * distance);
+    float dis    = length(lightPos - FragPos) / 10;
+    float attenuation = 1.0 / (dis * dis);
     vec3 radiance     = lightColor * attenuation;        
     
     // cook-torrance brdf

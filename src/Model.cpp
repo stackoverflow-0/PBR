@@ -10,14 +10,6 @@ Model::Model(const char * path) {
     std::getline(objfile,info);
     std::string flag;
 
-
-    // std::vector< glm::vec3 > temp_vertices;
-    // std::vector< glm::vec2 > temp_uvs;
-    // std::vector< glm::vec3 > temp_normals;
-
-    // std::vector<unsigned int> temp_vertex_ind;
-    // std::vector<unsigned int> temp_uv_ind;
-    // std::vector<unsigned int> temp_normal_ind;
     while (true) {
         objfile >> flag;
         

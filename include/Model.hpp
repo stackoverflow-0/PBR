@@ -1,5 +1,4 @@
-#ifndef _MODEL
-#define _MODEL
+#pragma once
 #include <vector>
 #include <glm/glm.hpp>
 // #include <glad/glad.h>
@@ -36,4 +35,3 @@ public:
     int get_vertex_num() { return vertex.size(); }
     void export_mesh(const char * path);
 };
-#endif

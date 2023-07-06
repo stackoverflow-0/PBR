@@ -3,33 +3,30 @@
 out vec4 FragColor;
 
 in vec3 FragPos;
-in vec3 normal;
 in vec2 uvCoord;
-in vec4 FragPosLightSpace;
+// in vec4 FragPosLightSpace;
 
-uniform vec3 objectColor;
+
+const float PI = 3.14159265359;
+
+
+// uniform vec3 objectColor;
 uniform vec3 lightColor;
 uniform vec3 lightPos; 
 uniform vec3 viewPos;
 
 uniform sampler2D shadowMap;
-uniform samplerCube skybox;
+// uniform samplerCube skybox;
 
-uniform bool use_sampler;
-uniform sampler2D texture_sampler;
-
-
-
-const float PI = 3.14159265359;
-
+uniform  mat4 model_inv_T;
 // material parameters
+uniform sampler2D albedoMap;
+uniform sampler2D metallicMap;
+uniform sampler2D roughnessMap;
+uniform sampler2D aoMap;
+uniform sampler2D normalMap;
 
-uniform vec3  albedo;
-uniform float metallic;
-uniform float roughness;
-uniform float ao;
-
-uniform int use_sampler_id;
+uniform mat4 lightSpaceMatrix;
 
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
@@ -92,10 +89,22 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {		
+    vec2 muvCoord = vec2(uvCoord.x, 1 - uvCoord.y);
+    vec3  albedo = texture(albedoMap, muvCoord).rgb;
+    float metallic = texture(metallicMap, muvCoord).r;
+    float roughness = texture(roughnessMap, muvCoord).r;
+    // Note : we use glossiness , roughness = 1 - glossiness
+    // roughness = 1.0 - roughness;
+    float ao = texture(aoMap, muvCoord).r;
+    // float ao = 0.1;
+
+    vec3 normal = texture(normalMap, muvCoord).xyz;
+
+    normal = mat3(model_inv_T) * normal;
     vec3 N = normalize(normal);
     vec3 V = normalize(viewPos - FragPos);
 
-    vec3 F0 = vec3(0.12, 0.12, 0.12); 
+    vec3 F0 = vec3(0.04, 0.04, 0.04) * (1 - metallic) + albedo * metallic; 
     F0 = mix(F0, albedo, metallic);
 	           
     // reflectance equation
@@ -127,29 +136,23 @@ void main()
     Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     // }   
   
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = vec3(0.03) * albedo * ao ;
+
+    vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos,1.0);
 
     float shadow = ShadowCalculation(FragPosLightSpace);
 
     vec3 R = reflect(-V, N);
 
-    Lo += texture(skybox, R).rgb;
-    Lo /= 2;
+    // Lo += texture(skybox, R).rgb;
+    // Lo /= 2;
 
-    vec3 color = ambient +  (1.0 - 0.8 * shadow) * Lo;
+    vec3 color = ambient + Lo;
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));  
 
-
-    if(use_sampler) {
-        // texture_sampler = use_sampler_id;
-        FragColor = vec4(texture(texture_sampler,vec2(uvCoord.x,1-uvCoord.y)).rgb * (1 - 0.5 * shadow),1);
-        
-    }
-    else {
-        FragColor = vec4(color,1);
-    }
-    // FragColor = vec4(shadow,0,0,1);
+    FragColor = vec4(color ,1);
+    // FragColor = vec4(0,0,0,1);
 }  
 
 

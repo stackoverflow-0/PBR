@@ -1,5 +1,4 @@
 # This file uses centimeters as units for non-parametric coordinates.
-
 mtllib rivetGun_low.mtl
 g default
 v 0.874004 0.255394 -1.206298

@@ -114,7 +114,7 @@ void main()
         // calculate per-light radiance
     vec3 L = normalize(lightPos - FragPos);
     vec3 H = normalize(V + L);
-    float dis    = length(lightPos - FragPos) / 10;
+    float dis    = length(lightPos - FragPos);
     float attenuation = 1.0 / (dis * dis);
     vec3 radiance     = lightColor * attenuation;        
     
@@ -136,7 +136,7 @@ void main()
     Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     // }   
   
-    vec3 ambient = vec3(0.03) * albedo * ao ;
+    vec3 ambient = vec3(0.3) * albedo * ao ;
 
     vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos,1.0);
 

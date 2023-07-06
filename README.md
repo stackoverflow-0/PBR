@@ -1,7 +1,7 @@
-# FreeSailing
-required:
+## PBS
+
+### build & run
 ```
-glm
-glew
-glfw
+make
+./main
 ```

@@ -138,7 +138,7 @@ GLFWwindow *init_window()
     glfwSetFramebufferSizeCallback(window, frame_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     if (glewInit() != GLEW_OK)
         throw std::runtime_error("glewInit failed");
     glEnable(GL_DEPTH_TEST);
@@ -203,7 +203,7 @@ int main()
 
     glm::vec3 lightColor = glm::vec3(1.0, 1.0, 1.0);
 
-    glm::vec3 lightPos = glm::vec3(0.0, 10.0f, 0.0);
+    glm::vec3 lightPos = glm::vec3(3.0, 5.0f, 3.0);
 
     pbrShader.setVec3("lightColor", lightColor);
     pbrShader.setVec3("lightPos", lightPos);
@@ -216,7 +216,7 @@ int main()
     // about depth texture
     unsigned int depthMapFBO;
     unsigned int depthMap;
-    const unsigned int SHADOW_WIDTH = 4096 * 2, SHADOW_HEIGHT = 4096 * 2;
+    const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
     {
         glGenFramebuffers(1, &depthMapFBO);
 
@@ -290,14 +290,14 @@ int main()
             point light
             -----------
         */
-        float near_plane = 0.0f, far_plane = 50.0f;
-        float s = 8.0f;
+        float near_plane = 0.0f, far_plane = 10.0f;
+        float s = 2.0f;
         glm::mat4 lightProjection = glm::ortho(-s, s, -s, s, near_plane, far_plane);
         // auto dir =  glm::vec4(0,0,1,1);
         glm::mat4 lightView = glm::lookAt(
-            glm::vec3(0, 10.0f, 0), // lightPos,
+            lightPos, // lightPos,
             glm::vec3(0, 0, 0),
-            glm::vec3(0.0f, 0.0f, 1.0f));
+            glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
         // draw sky box
@@ -317,6 +317,7 @@ int main()
         glDisable(GL_CULL_FACE);
         glClear(GL_DEPTH_BUFFER_BIT);
 
+            depthShader.use();
             object.draw(GL_TRIANGLES);
 
         glEnable(GL_CULL_FACE);

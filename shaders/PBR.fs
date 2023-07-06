@@ -2,8 +2,11 @@
 
 out vec4 FragColor;
 
+
+
 in vec3 FragPos;
 in vec2 uvCoord;
+in vec3 Normal;
 // in vec4 FragPosLightSpace;
 
 
@@ -98,7 +101,7 @@ void main()
     float ao = texture(aoMap, muvCoord).r;
     // float ao = 0.1;
 
-    vec3 normal = texture(normalMap, muvCoord).xyz;
+    vec3 normal = Normal + texture(normalMap, muvCoord).xyz; 
 
     normal = mat3(model_inv_T) * normal;
     vec3 N = normalize(normal);
@@ -115,7 +118,7 @@ void main()
     vec3 L = normalize(lightPos - FragPos);
     vec3 H = normalize(V + L);
     float dis    = length(lightPos - FragPos);
-    float attenuation = 1.0 / (dis * dis);
+    float attenuation = 50.0 / (dis * dis);
     vec3 radiance     = lightColor * attenuation;        
     
     // cook-torrance brdf
@@ -136,7 +139,7 @@ void main()
     Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     // }   
   
-    vec3 ambient = vec3(0.3) * albedo * ao ;
+    vec3 ambient = vec3(0.1) * albedo * ao ;
 
     vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos,1.0);
 
@@ -147,7 +150,9 @@ void main()
     // Lo += texture(skybox, R).rgb;
     // Lo /= 2;
 
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + (1 - shadow) * Lo;
+    // vec3 color = ambient + Lo;
+    // color = Lo;
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));  
 
